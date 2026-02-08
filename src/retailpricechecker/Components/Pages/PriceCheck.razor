@@ -1,0 +1,179 @@
+﻿@page "/price-check"
+@rendermode InteractiveServer
+@using Newtonsoft.Json;
+@using System.ComponentModel.DataAnnotations
+@using retailpricechecker.Services
+@using retailpricechecker.Services.Interfaces
+@using retailpricechecker.Models
+@using Csc.D365.RetailProduct.Dto
+@using retailpricechecker.Components
+@inject NavigationManager Navigation
+@inject LocationState Location
+
+<PageTitle>Retail Price Check App</PageTitle>
+<div class="main-body-container">
+    @if (!hasSearched)
+    {
+        <div>
+            <EditForm Model="lookupModel" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="form-container">
+                    <label for="upc-input">Enter the item's UPC:</label>
+                    <InputText @bind-Value="lookupModel.UPC" id="upc-input" class="input-field" />
+                    <button type="submit" class="submit-btn">
+                        Submit
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    }
+    else
+    {
+        @if (loading)
+        {
+            <div class="loading-container">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">Loading product information...</div>
+            </div>
+        }
+        else
+        {
+            <div class="product-card-container fadeInUp-animation">
+                <div class="product-card">
+                    @if (productFound)
+                    {
+                        <div class="product-results">
+                            <div class="img-container">
+                                <img src="@productModel.Image" />
+                            </div>
+                            <div class="product-info">
+                                <div id="product-name">@productModel.Name</div>
+                                <div class="upc-value"><b>UPC: </b>@lookupModel.UPC</div>
+                                <div class="color"><b>Color: </b>@productModel.Color</div>
+                                <div class="size"><b>Size: </b>@productModel.Size</div>
+                                <div class="price-container">
+                                    <b>Price:</b>
+                                    <div class="price">
+                                        <b>$@productModel.Price</b>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="location">
+                            <i>Product information is only valid for the store location: @productModel.Address</i>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="product-results-not-found">
+                            <h1>Product not found</h1>
+                            <h4> (UPC: @lookupModel.UPC)</h4>
+                        </div>
+                    }
+                </div>
+                <div class="buttons-container">
+                    <button @onclick=NavigateToHome id="done-button">Done</button>
+                    <button @onclick=Reset id="check-another-item-btn">Check Another Item</button>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [CascadingParameter]
+    public string? SelectedPriceGroup { get; set; }
+
+    private class LookupModel
+    {
+        [Required]
+        public string? UPC { get; set; }
+    }
+
+    private class ProductItem
+    {
+        public string? Name { get; set; }
+        public decimal? Price { get; set; }
+        public string? Size { get; set; }
+        public string? Color { get; set; }
+        public string? Image { get; set; }
+        public string? Address { get; set; }
+    }
+
+    private LookupModel? lookupModel = new();
+    private ProductItem? productModel = new();
+    private bool hasSearched = false;
+    private bool loading = false;
+    private bool productFound = true;
+
+    [Inject] private IRetailProdClientService RetailProdService { get; set; }
+    [Inject] private ICommercePricingClientService CommercePricingService { get; set; }
+    [Inject] private IImageService ImageService { get; set; }
+
+    private void Reset()
+    {
+        hasSearched = !hasSearched;
+        lookupModel.UPC = "";
+        productModel = new();
+    }
+    private void NavigateToHome() => Navigation.NavigateTo("/");
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            loading = true;
+            hasSearched = true;
+
+            if (Location.CurrentLocation == null || SelectedPriceGroup == "")
+            {
+                productFound = false;
+                return;
+            }
+
+            string locationId = Location.CurrentLocation.Id;
+            string region = Location.CurrentLocation.Region;
+            string country = Location.CurrentLocation.Address.Country;
+
+            var commercePricingData = await CommercePricingService.GetRetailPricingData(lookupModel.UPC, region + locationId);
+
+            if (commercePricingData == null)
+            {
+                productFound = false;
+                return;
+            }
+
+            var retailProdData = await RetailProdService.GetRetailProductData(country, commercePricingData.Style);
+            var imageData = await ImageService.GetProductImageString(commercePricingData.Style);
+            dynamic json = JsonConvert.DeserializeObject(imageData);
+
+            // Fetch specific image from Content Hub
+            productModel.Image = json["assets"][2]["publicLinks"][7]["link"];
+            productModel.Name = retailProdData.StyleDescription;
+            productModel.Color = retailProdData.Materials[1].ColorWay.ColorwayName;
+            productModel.Size = retailProdData.Materials[2].MaterialVariants[0].SizeName;
+            productModel.Address = $"{Location.CurrentLocation.Address.AddressLine1}, {Location.CurrentLocation.Address.City}, {Location.CurrentLocation.Address.StateProvince}";
+            productModel.Price = commercePricingData.Prices[0].Price;
+
+            if (SelectedPriceGroup == "MILT")
+            {
+                productModel.Price = Math.Round((productModel.Price ?? 0) * 0.90m, 2);
+            }
+            else if (SelectedPriceGroup == "EMP")
+            {
+                productModel.Price = Math.Round((productModel.Price ?? 0) * 0.60m, 2);
+            }
+            productFound = true;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine(ex.GetType().FullName);
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+}

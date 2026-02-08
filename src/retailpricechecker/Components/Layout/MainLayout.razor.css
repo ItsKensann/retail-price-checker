@@ -1,0 +1,163 @@
+*{
+    font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Helvetica", "Lucinda Grande", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-weight: 400;
+    line-height: 1.3571428571;
+    color: #000;
+}
+
+.page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-section {
+    display: flex;
+    justify-content: center;
+}
+
+main {
+    flex: 1;
+}
+
+.nav-bar {
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #d6d5d5;
+    display: flex;
+    flex-direction: row;
+    justify-content:space-between;  
+    align-items: center;          
+    height: 3.5rem;               
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-right: 1.5rem;
+}
+
+.nav-title {
+    margin-left: 1.75rem;
+    margin-top: .7rem;
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+.logo-link {
+    display: inline-block;
+    margin-left: 1rem;            
+}
+
+.columbia-logo {
+    height: 50px;                 
+    width: auto;                 
+    margin-left: 1rem;                    
+}
+
+.dropdown-menu-container {
+    color: black;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.dropdown-menu-container {
+    color: blue;
+}
+
+.dropdown-menu-container .location-dropdown,
+.dropdown-menu-container .price-group-dropdown {
+    margin-bottom: 10px;
+}
+
+.dropdown-menu-container select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    background-color: white;
+    color: #333;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.dropdown-menu-container select:hover {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+.dropdown-menu-container select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+}
+
+.dropdown-menu-container select option {
+    padding: 10px;
+    color: #333;
+    background-color: white;
+}
+
+.dropdown-menu-container select option:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.dropdown-menu-container select option:checked {
+    background-color: #007bff;
+    color: white;
+    font-weight: 500;
+}
+
+.dropdown-menu-container select option:checked,
+.dropdown-menu-container select option[selected] {
+    background-color: #007bff !important;
+    color: white !important;
+}
+
+.dropdown-menu-container select option[value=""] {
+    color: #6c757d;
+    font-style: italic;
+}
+
+.dropdown-menu-container select option:checked {
+    background: linear-gradient(#007bff, #007bff);
+    color: white;
+}
+
+@keyframes fadeInUp {
+    0% {
+        transform: translateY(5%);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0%);
+        opacity: 1;
+    }
+}
+
+.fadeInUp-animation {
+    animation: 1.0s fadeInUp;
+}
+
+#blazor-error-ui {
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }

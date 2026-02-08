@@ -1,0 +1,11 @@
+webapp:
+  Secrets:
+    - category: resteam
+      name: APIGateway-CommerceServiceKey 
+    - category: resteam
+      name: APIGateway-SupplyChainServiceKey 
+  AppSettings: 
+    LocationServiceBaseUrl: 'https://api-c1-sit3.columbia.com/locations/v1/locations/'
+    RetailProdServiceBaseUrl: 'https://api-c1-sit3.columbia.com/retail-product-api/v1/retailmasters/'
+    CommercePricingServiceBaseUrl: 'https://api-c1-sit3.columbia.com/commercepricing/v1/commercepricing/'
+    ImageServiceBaseUrl: 'https://api-c1-sit3.columbia.com/ContentHubImage/api/Image/v2/images/'

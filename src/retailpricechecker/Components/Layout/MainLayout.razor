@@ -1,0 +1,100 @@
+﻿@using Csc.Enterprise.Location.Dto
+@using retailpricechecker.Services
+@using retailpricechecker.Services.Interfaces
+@using System.ComponentModel.DataAnnotations
+@rendermode InteractiveServer
+@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+@inject LocationState LocationState
+
+<div class="page">
+    <main>
+        <div class="nav-bar">
+            <div class="nav-item">
+                <NavLink href="/" class="logo-link">
+                    <img src="https://logos-world.net/wp-content/uploads/2020/12/Columbia-Emblem-700x394.png" class="columbia-logo" />
+                </NavLink>
+                @if (OnMainPage())
+                {
+                    <div class="nav-title">Retail Price Checker</div>
+                }
+            </div>
+            <div class="nav-item dropdown-menu-container">
+                @if (!OnMainPage())
+                {
+                    <div class="dropdown-menu-container">
+                        <InputSelect @bind-Value="selectedLocation" @bind-Value:after="OnLocationSelected">
+                            <option value="">Select Location</option>
+                            <option value="425US">Portland Employee Store</option>
+                            <option value="435US">Woodburn Outlets Factory Store</option>
+                            <option value="440US">Lake Oswego Retail Store</option>
+                        </InputSelect>
+                    </div>
+                    <div class="price-group-dropdown">
+                        <InputSelect @bind-Value="selectedPriceGroup">
+                            <option value="">Select Price Group</option>
+                            <option value="STD">Standard</option>
+                            <option value="MILT">Military</option>
+                            <option value="EMP">Employee</option>
+                        </InputSelect>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="main-section fadeInUp-animation">
+            <CascadingValue Value="@selectedPriceGroup">
+                @Body
+            </CascadingValue>
+        </div>
+    </main>
+</div>
+
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
+
+@code {
+    private string selectedLocation = "";
+    private string selectedPriceGroup = "";
+
+    [Inject] private ILocationClientService LocationService { get; set; }
+
+    protected async Task OnLocationSelected()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(selectedLocation))
+            {
+                LocationState.SetLocation(null);
+                return;
+            }
+
+            var storeId = selectedLocation.Substring(0, selectedLocation.Length - 2);
+            var region = selectedLocation.Substring(selectedLocation.Length - 2);
+            var locationData = await LocationService.GetLocationData(storeId, region);
+
+            if (locationData != null)
+            {
+                LocationState.SetLocation(locationData);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Location selection error: {ex.Message}");
+            selectedLocation = "";
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+
+    private bool OnMainPage()
+    {
+        var uri = Navigation.ToBaseRelativePath(Navigation.Uri);
+        return uri == "price-check";
+    }
+}
+

@@ -1,0 +1,80 @@
+name: $(Build.DefinitionName)-$(Date:yyyyMMdd)$(Rev:.r)
+resources:
+  repositories:
+  - repository: 'az-pipelines-templates' # Name of the repository
+    type: github # github for GitHub repo's git for ADO repo's
+    endpoint:  'columbia1938-ODP-Retail' # name of the ado service connection
+    name: 'columbia1938/az-pipelines-templates' # org/repo
+
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - /.vsts-ci/retailpricechecker-ci.yml
+      - /ci/retailpricechecker/*
+      - /src/retailpricechecker/*
+      - /tests/*   
+
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - /.vsts-ci/retailpricechecker-ci.yml
+      - /ci/retailpricechecker/*
+      - /src/retailpricechecker/*
+      - /tests/*    
+
+stages:
+  - stage: Build
+    displayName: Build Stage
+    jobs:
+      - template: templates/api.template.yml@az-pipelines-templates
+        parameters:
+          SiteName: 'retailpricechecker'
+          DotNetCoreVersion: '8.x'
+
+  - stage: Deploy_Dev
+    dependsOn: Build
+    condition: "and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))"
+    displayName: Deploy Dev
+    jobs:
+      - template: templates/webapp-deploy.template.yml@az-pipelines-templates
+        parameters:
+          Environment: 'dev'
+          Team: 'retailtech'
+          SiteName: 'retailpricechecker'
+
+  - stage: Deploy_SIT3
+    dependsOn: Deploy_Dev
+    displayName: Deploy C1-SIT3
+    jobs:
+      - template: templates/webapp-deploy.template.yml@az-pipelines-templates
+        parameters:
+          Environment: 'c1-sit3'
+          Team: 'retailtech'
+          SiteName: 'retailpricechecker'
+
+  - stage: Deploy_Perf
+    dependsOn: Deploy_Dev
+    displayName: Deploy C1-Perf
+    jobs:
+      - template: templates/webapp-deploy.template.yml@az-pipelines-templates
+        parameters:
+          Environment: 'c1-perf'
+          Team: 'retailtech'
+          SiteName: 'retailpricechecker'
+
+  - stage: Deploy_Prod
+    dependsOn: 
+      - Deploy_SIT3
+    displayName: Deploy Prod
+    jobs:
+      - template: templates/webapp-deploy.template.yml@az-pipelines-templates
+        parameters:
+          Environment: 'prod'
+          Team: 'retailtech'
+          SiteName: 'retailpricechecker'

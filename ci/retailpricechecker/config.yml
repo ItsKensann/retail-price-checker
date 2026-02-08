@@ -1,0 +1,22 @@
+webapp:
+  SiteName: 'retailpricechecker'  
+  SiteLocation: westus3
+  #############################
+  # Service Resource Settings #
+  sku: Standard
+  workerSize: '0'
+  skuCode: S1
+  ServicePlanTier: S1
+  ServicePlanSku: Standard
+  rgLocation: westus
+  AlwaysOn: true
+  #############################
+  WebSecurityVersion: '2019-11-01'
+  
+  aad: false
+      
+Tags:
+  application: 'retailpricechecker'
+  cost-center: 1002530100  
+  managed-by: '#DTC_TechTeam@columbia.com'
+  squad-Id: 10101  
