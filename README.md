@@ -1,6 +1,6 @@
 # Retail Price Checker
 
-A user-friendly web application that enables customers to scan product UPCs and instantly retrieve accurate pricing, product details, and availability information across Columbia retail locations.
+⚠️ Disclaimer: This repository is a portfolio showcase of work completed during an internship. The code is provided for demonstration purposes only and is not functional in its current state, as it requires internal API keys, connection strings, and other proprietary configurations that have been removed for security reasons. This project is intended to display the scope and quality of work completed during the internship period.
 
 ## Overview
 
