@@ -4,7 +4,7 @@
 
 ## Overview
 
-The Retail Price Checker provides customers with a seamless way to verify product pricing in real-time. By scanning a Universal Product Code (UPC), users can access comprehensive product information including current price, description, images, size, and color options—all tailored to their specific store location.
+The Retail Price Checker provides customers with a seamless way to verify product pricing in real-time. By scanning a Universal Product Code (UPC), users can access comprehensive product information including current price, description, images, size, and color options tailored to their specific store location.
 
 ### Key Features
 
